@@ -28,8 +28,8 @@ class Grid:
         #print(self.grid)           
     def draw_grid(self, display):
         switch = True
-        grid_color1 = (211, 211, 211)
-        grid_color2 = (192, 192, 192)
+        grid_color1 = (170,215,81)
+        grid_color2 = (162,209,73)
         for x in range(self.x):
             for y in range(self.y):
                 if not switch:

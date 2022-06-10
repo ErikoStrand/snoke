@@ -8,6 +8,7 @@ class snake:
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
         self.direction = 1
         self.locations = []
+        self.locationsdirection = []
         self.keys = []
         self.click = True
         self.length = 1
