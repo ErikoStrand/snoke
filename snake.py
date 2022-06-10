@@ -11,7 +11,7 @@ class snake:
         self.locationsdirection = []
         self.keys = []
         self.click = True
-        self.length = 1
+        self.length = 2
     def update(self, dt, event):
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_RIGHT and self.click:

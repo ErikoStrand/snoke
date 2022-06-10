@@ -117,9 +117,9 @@ while MAIN_MENU:
                             head.locations.pop(0)
                             
             if event.type == SAVE_TIMER:
-                print("Saved")
                 with open("STATS_VALUES.dat", "wb") as f:
-                    pickle.dump(STATS_VALUES, f)                
+                    pickle.dump(STATS_VALUES, f)   
+                                 
             if event.type == PLAY_TIME:
                 STATS_VALUES[3][1] += 1          
             if RETRY_BUTTON.update(event, display, ACTIVE, False) and RETRY:
@@ -159,10 +159,23 @@ while MAIN_MENU:
         for body in range(len(head.locations)):
             # 2 side 4 up down width height
             heads = list(head.locations[body])
-            if head.locationsdirection[body] != head.locationsdirection[body - 1] and body != 0:
-                pygame.draw.rect(display, SNAKE_COLOR, (heads[0], heads[1], heads[2], heads[3]))
-            elif head.locationsdirection[body] != head.locationsdirection[body - 1] and body != 0:
-                pygame.draw.rect(display, SNAKE_COLOR, (heads[0], heads[1], heads[2], heads[3]))
+            head_dir = head.locationsdirection[body]
+            head_dir_prev = head.locationsdirection[body - 1]
+            if head_dir != head_dir_prev and body != 0:
+                if head_dir == 4 and head_dir_prev == 2 or head_dir == 1 and head_dir_prev == 3:
+                    # left top width height
+                    pygame.draw.rect(display, SNAKE_COLOR, (heads[0] + 5, heads[1] + 5, heads[2] - 5, heads[3] - 10))
+                    pygame.draw.rect(display, SNAKE_COLOR, (heads[0] + 5, heads[1] + 5, heads[2] - 10, heads[3] - 5))
+                if head_dir == 4 and head_dir_prev == 1 or head_dir == 2 and head_dir_prev == 3:
+                    pygame.draw.rect(display, SNAKE_COLOR, (heads[0], heads[1] + 5, heads[2] - 5, heads[3] - 10))
+                    pygame.draw.rect(display, SNAKE_COLOR, (heads[0] + 5, heads[1] + 5, heads[2] - 10, heads[3] - 5))
+                if head_dir == 3 and head_dir_prev == 1 or head_dir == 2 and head_dir_prev == 4:
+                    pygame.draw.rect(display, SNAKE_COLOR, (heads[0] + 5, heads[1], heads[2] - 10, heads[3] - 5))
+                    pygame.draw.rect(display, SNAKE_COLOR, (heads[0], heads[1] + 5, heads[2] - 5, heads[3] - 10))
+                if head_dir == 3 and head_dir_prev == 2 or head_dir == 1 and head_dir_prev == 4:
+                    pygame.draw.rect(display, SNAKE_COLOR, (heads[0] + 5, heads[1], heads[2] - 10, heads[3] - 5))
+                    pygame.draw.rect(display, SNAKE_COLOR, (heads[0] + 5, heads[1] + 5, heads[2] - 5, heads[3] - 10))
+                print(head.locationsdirection[body], head.locationsdirection[body - 1]) # direction, previous
                 
             elif head.locationsdirection[body] == 2 or head.locationsdirection[body] == 1:
                 pygame.draw.rect(display, SNAKE_COLOR, (heads[0], heads[1] + 5, heads[2], heads[3] - 10))
@@ -174,7 +187,7 @@ while MAIN_MENU:
             if head.length > STATS_VALUES[1][1]:
                 STATS_VALUES[1][1] = head.length
                 
-            draw_text("GAME OVER", 40, (180, 180, 180), WIDTH/2, HEIGHT/3)
+            draw_text("GAME OVER", 40, (50, 50, 50), WIDTH/2, HEIGHT/3)
             RETRY_BUTTON.draw_button(display, (255, 255, 255), DEACTIVE, False)
             RETURN_BUTTON.draw_button(display, (255, 255, 255), DEACTIVE, False)
         pygame.display.flip()
