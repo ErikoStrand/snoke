@@ -30,18 +30,20 @@ RETRY = False
 STATS = False
 # work
 display = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_icon(grid.apple)
+pygame.display.set_caption("Snoke")
 pygame.time.set_timer(MOVE_SNAKE, 200)
 pygame.time.set_timer(SAVE_TIMER, 2500)
 pygame.time.set_timer(PLAY_TIME, 1000)
 # buttons
 RETRY_BUTTON = button("Retry?", 50, WIDTH/2 - 100/2, HEIGHT/2.3, 100, 25)
 RETURN_BUTTON = button("Return", 50, WIDTH/2 - 100/2, HEIGHT/2.1, 100, 25)
-TITLE = button("snoke", 70, WIDTH/2 - 150, 100, 300, 50)
+TITLE = button("Snoke", 70, WIDTH/2 - 150, 100, 300, 50)
 START_BUTTON = button("Start", 30, WIDTH/2 - 100/2, HEIGHT/3, 100, 50)
 STATS_BUTTON = button("Stats", 30, WIDTH/2 - 100/2, HEIGHT/2.5, 100, 50)
 BACK_BUTTON = button("Back", 20, 10, 10, 50, 25)
 
-#STATS_VALUES = {0: ["Apples: ", 0, ""], 1: ["Highscore: ", 0, ""], 2: ["Distance: ", 0, ""], 3: ["Timeplayed: ", 0, " s"]}
+#STATS_VALUES = {0: ["Apples: ", 0, ""], 1: ["Highscore: ", 0, ""], 2: ["Distance: ", 0, " m"], 3: ["Timeplayed: ", 0, " s"]}
 
 #with open("STATS_VALUES.dat", "wb") as f:
     #pickle.dump(STATS_VALUES, f)
@@ -98,7 +100,12 @@ while MAIN_MENU:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit()
-            if event.type == MOVE_SNAKE:
+            if event.type == MOVE_SNAKE and not RETRY:
+                print(head.keys)
+                
+                if len(head.keys) >= 1:
+                    head.direction = head.keys[0]   
+                    head.keys.pop(0)
                 if head.direction == 1:
                     head.x += grid.square_size
                 elif head.direction == 2:
@@ -175,7 +182,7 @@ while MAIN_MENU:
                 if head_dir == 3 and head_dir_prev == 2 or head_dir == 1 and head_dir_prev == 4:
                     pygame.draw.rect(display, SNAKE_COLOR, (heads[0] + 5, heads[1], heads[2] - 10, heads[3] - 5))
                     pygame.draw.rect(display, SNAKE_COLOR, (heads[0] + 5, heads[1] + 5, heads[2] - 5, heads[3] - 10))
-                print(head.locationsdirection[body], head.locationsdirection[body - 1]) # direction, previous
+                #print(head.locationsdirection[body], head.locationsdirection[body - 1]) # direction, previous
                 
             elif head.locationsdirection[body] == 2 or head.locationsdirection[body] == 1:
                 pygame.draw.rect(display, SNAKE_COLOR, (heads[0], heads[1] + 5, heads[2], heads[3] - 10))
