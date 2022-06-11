@@ -9,7 +9,6 @@ WIDTH, HEIGHT = 850, 750
 grid = Grid(15, WIDTH, HEIGHT)      
 grid.create_grid()
 head = snake(grid.grid[0][0])
-grid.random_apple(3)
 pygame.init()
 pygame.font.init()
 clock = pygame.time.Clock()
@@ -73,6 +72,7 @@ while MAIN_MENU:
             head.direction = 0
             MAIN_MENU = False
             RUNNING = True
+            grid.random_apple(5)
         if STATS_BUTTON.update(event, display, ACTIVE, False):
             MAIN_MENU = False
             STATS = True    
@@ -101,6 +101,7 @@ while MAIN_MENU:
             if event.type == pygame.QUIT:
                 sys.exit()
             if event.type == MOVE_SNAKE and not RETRY:
+                print(grid.board)
                 if len(head.keys) >= 1:
                     head.direction = head.keys[0]   
                     head.keys.pop(0)
@@ -135,7 +136,7 @@ while MAIN_MENU:
                 head.direction = 0
                 RETRY = False
                 grid.apple_locations = []
-                grid.random_apple(3)
+                grid.random_apple(5)
                 
             if RETURN_BUTTON.update(event, display, ACTIVE, False) and RETRY:
                 RETRY = False
@@ -157,13 +158,13 @@ while MAIN_MENU:
                                 grid.board[x][y] = 0
                                 
         # checking snake collisions.                        
-        for body in range(len(head.locations)):
-            if head.rect.colliderect(head.locations[body]):
+        for body in head.locations:
+            if head.rect.colliderect(body):
                 head.direction = 0
                 RETRY = True
         if head.x < 0 or head.x > WIDTH - 50 or head.y < 0 or head.y > HEIGHT - 50:
             head.direction = 0
-            RETRY = True
+            RETRY = True            
         # apple
         for locations in range(len(grid.apple_locations)):
             if locations < len(grid.apple_locations):
@@ -171,9 +172,8 @@ while MAIN_MENU:
                     grid.board[grid.apple_locations[locations][0]][grid.apple_locations[locations][1]] = 0
                     head.length += 1
                     STATS_VALUES[0][1] += 1
-                    grid.apple_locations.pop(locations)        
-        if grid.apple_locations == []:
-            grid.random_apple(3)
+                    grid.apple_locations.pop(locations)
+                    grid.random_apple(1)
                
         #drawing details
         grid.draw_grid(display)
