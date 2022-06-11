@@ -9,7 +9,7 @@ WIDTH, HEIGHT = 850, 750
 grid = Grid(15, WIDTH, HEIGHT)      
 grid.create_grid()
 head = snake(grid.grid[0][0])
-grid.random_apple()
+grid.random_apple(3)
 pygame.init()
 pygame.font.init()
 clock = pygame.time.Clock()
@@ -101,8 +101,6 @@ while MAIN_MENU:
             if event.type == pygame.QUIT:
                 sys.exit()
             if event.type == MOVE_SNAKE and not RETRY:
-                print(head.keys)
-                
                 if len(head.keys) >= 1:
                     head.direction = head.keys[0]   
                     head.keys.pop(0)
@@ -118,6 +116,7 @@ while MAIN_MENU:
                     STATS_VALUES[2][1] += 1
                     if len(head.locations) < head.length:
                         head.locations.append(head.rect)
+                        #print(head.locations)
                         head.locationsdirection.append(head.direction)
                         if len(head.locations) == head.length:
                             head.locationsdirection.pop(0)
@@ -128,11 +127,16 @@ while MAIN_MENU:
                     pickle.dump(STATS_VALUES, f)   
                                  
             if event.type == PLAY_TIME:
-                STATS_VALUES[3][1] += 1          
+                STATS_VALUES[3][1] += 1 
+                         
             if RETRY_BUTTON.update(event, display, ACTIVE, False) and RETRY:
+                grid.board = np.zeros((grid.x, grid.y))
                 head = snake(grid.grid[0][0])
                 head.direction = 0
                 RETRY = False
+                grid.apple_locations = []
+                grid.random_apple(3)
+                
             if RETURN_BUTTON.update(event, display, ACTIVE, False) and RETRY:
                 RETRY = False
                 RUNNING = False
@@ -141,28 +145,42 @@ while MAIN_MENU:
         display.fill(BACKGROUND)
         # update
         head.update(dt, event)
-        
+        # making it so the grid.board knows where the snake is
+        for count, body in enumerate(head.locations):
+            for x in range(grid.x):
+                for y in range(grid.y):
+                    if grid.grid[x][y] == body:
+                        grid.board[x][y] = 1
+                    if count == 0:
+                        if grid.grid[x][y] != body:
+                            if grid.board[x][y] != 2:
+                                grid.board[x][y] = 0
+                                
+        # checking snake collisions.                        
         for body in range(len(head.locations)):
             if head.rect.colliderect(head.locations[body]):
                 head.direction = 0
                 RETRY = True
         if head.x < 0 or head.x > WIDTH - 50 or head.y < 0 or head.y > HEIGHT - 50:
             head.direction = 0
-            RETRY = True     
-        if head.rect.colliderect(grid.grid[grid.apple_locations[0][0]][grid.apple_locations[0][1]]):
-            grid.board[grid.apple_locations[0][0]][grid.apple_locations[0][1]] = 0
-            grid.apple_locations.clear()
-            grid.random_apple()
-            head.length += 1
-            STATS_VALUES[0][1] += 1
-            #print(head.length)
-            
-        #draw
-        #print(grid.board)
+            RETRY = True
+        # apple
+        for locations in range(len(grid.apple_locations)):
+            if locations < len(grid.apple_locations):
+                if head.rect.colliderect(grid.grid[grid.apple_locations[locations][0]][grid.apple_locations[locations][1]]):
+                    grid.board[grid.apple_locations[locations][0]][grid.apple_locations[locations][1]] = 0
+                    head.length += 1
+                    STATS_VALUES[0][1] += 1
+                    grid.apple_locations.pop(locations)        
+        if grid.apple_locations == []:
+            grid.random_apple(3)
+               
+        #drawing details
         grid.draw_grid(display)
         grid.draw_apples(display)
-        pygame.draw.rect(display, SNAKE_COLOR, (head.rect.left, head.rect.top, head.rect.width, head.rect.height))
         
+        # snake body and head
+        pygame.draw.rect(display, SNAKE_COLOR, (head.rect.left, head.rect.top, head.rect.width, head.rect.height))
         for body in range(len(head.locations)):
             # 2 side 4 up down width height
             heads = list(head.locations[body])
@@ -182,14 +200,13 @@ while MAIN_MENU:
                 if head_dir == 3 and head_dir_prev == 2 or head_dir == 1 and head_dir_prev == 4:
                     pygame.draw.rect(display, SNAKE_COLOR, (heads[0] + 5, heads[1], heads[2] - 10, heads[3] - 5))
                     pygame.draw.rect(display, SNAKE_COLOR, (heads[0] + 5, heads[1] + 5, heads[2] - 5, heads[3] - 10))
-                #print(head.locationsdirection[body], head.locationsdirection[body - 1]) # direction, previous
                 
             elif head.locationsdirection[body] == 2 or head.locationsdirection[body] == 1:
                 pygame.draw.rect(display, SNAKE_COLOR, (heads[0], heads[1] + 5, heads[2], heads[3] - 10))
             elif head.locationsdirection[body] == 4 or head.locationsdirection[body] == 3:   
                 pygame.draw.rect(display, SNAKE_COLOR, (heads[0] + 5, heads[1], heads[2] - 10, heads[3]))
-            #pygame.draw.rect(display, SNAKE_COLOR, (head.locations[body]))
-            
+                
+        # drawing the menu if the player has died   
         if not head.direction and RETRY:
             if head.length > STATS_VALUES[1][1]:
                 STATS_VALUES[1][1] = head.length
@@ -197,6 +214,7 @@ while MAIN_MENU:
             draw_text("GAME OVER", 40, (50, 50, 50), WIDTH/2, HEIGHT/3)
             RETRY_BUTTON.draw_button(display, (255, 255, 255), DEACTIVE, False)
             RETURN_BUTTON.draw_button(display, (255, 255, 255), DEACTIVE, False)
+            
+        # updaterar skärmen.
         pygame.display.flip()
         
-        # byt till rows and collumns.

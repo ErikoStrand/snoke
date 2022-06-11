@@ -39,14 +39,17 @@ class Grid:
                     pygame.draw.rect(display, grid_color2, self.grid[x][y])
                     switch = not switch
                 
-    def random_apple(self):
-        x = np.random.randint(0, self.x)
-        y = np.random.randint(0, self.y)
-        #print(x, y)
-        if self.board[x][y] == 0:
-            self.board[x][y] = 2
-            self.apple_locations.append([x, y])
-            #print(self.board)
+    def random_apple(self, amount):
+        for apples in range(amount):
+            while 1:
+                x = np.random.randint(0, self.x)
+                y = np.random.randint(0, self.y)
+                #print(x, y)
+                if self.board[x][y] == 0 and self.board[x][y] != 2:
+                    self.board[x][y] = 2
+                    self.apple_locations.append([x, y])
+                    break
+                #print(self.board)
             
     def draw_apples(self, display):
         for x in range(self.x):
